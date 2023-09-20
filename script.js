@@ -88,8 +88,11 @@ const GameBoard = (() => {
   }
 
   const reset = () => {
-    gameboard = [];
-    create_gameboard();
+    for (let i = 0; i < 3; i++){
+      for (let j = 0; j < 3; j++){
+        gameboard[i][j] = '';
+      }
+    }
   }
 
   return {
@@ -101,6 +104,26 @@ const GameBoard = (() => {
     is_full,
   };
 
+})();
+
+const Dialog = (() =>{
+  const element = document.querySelector('dialog');
+  const text = document.querySelector('.dialog-text');
+  const button = document.querySelector('.dialog-button');
+
+  const set_text = string => text.innerHTML = string;
+  button.addEventListener('click', (e) => {
+    element.close();
+  })
+
+  const show = string => {
+    set_text(string);
+    element.showModal();
+  }
+
+  return {
+    show,
+  }
 })();
 
 const HTMLGameboard = (() => {
@@ -129,13 +152,32 @@ const HTMLGameboard = (() => {
   const set_token = char => token = char;
 
   const set_info = string => info.innerHTML = string;
+  const get_info = () => info.innerHTML;
+
+  const reset = () => {
+    for (child of gameboard.children){
+      child.innerHTML = '';
+    }
+  }
 
   create_gameboard();
 
   return {
     set_token,
     set_info,
+    get_info,
+    reset,
   }
+})();
+
+const ResetButton =(() => {
+  button = document.querySelector('.reset-button');
+  button.addEventListener('click', () => {
+    GameBoard.reset();
+    HTMLGameboard.reset();
+    Game.reset();
+    console.log(GameBoard.get_gameboard());
+  })
 })();
 
 const Game = (() => {
@@ -165,9 +207,11 @@ const Game = (() => {
       }
       else{
         player_won_info();
+        Dialog.show(HTMLGameboard.get_info());
       }
       if(GameBoard.is_full()){
         no_winner_info();
+        Dialog.show(HTMLGameboard.get_info());
         finish = true;
       }
       return true;
@@ -175,10 +219,18 @@ const Game = (() => {
     return false;
   }
 
+  const reset = () => {
+    winner = '';
+    finish = false;
+    current_player = p1;
+    next_player_info();
+  }
+
   next_player_info();
 
   return {
     make_move,
     winner,
+    reset,
   }
 })();
