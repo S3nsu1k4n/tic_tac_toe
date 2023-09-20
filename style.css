@@ -1,6 +1,6 @@
 body{
-  background-color: black;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -9,8 +9,21 @@ body{
 }
 
 .gameboard{
-  background-color: white;
+  background-color: black;
   height: 50%;
   width: 50%;
   display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+.cell{
+  background-color: lightgray;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 22px;
+}
+.info{
+  font-size: 22px;
 }

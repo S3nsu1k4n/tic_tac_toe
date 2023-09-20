@@ -1,7 +1,6 @@
 //Factories: Player
 
 const Player = (name, token) => {
-
   return {
     name,
     token,
@@ -9,7 +8,6 @@ const Player = (name, token) => {
 }
 
 const GameBoard = (() => {
-
   const gameboard = [];
 
   const create_gameboard = () => {
@@ -83,7 +81,10 @@ const GameBoard = (() => {
     winner = check_diagonal();
     if (winner != '') return winner;
     return '';
-    
+  }
+
+  const is_full = () => {
+    return gameboard.flat().join('').length == 9;
   }
 
   const reset = () => {
@@ -97,48 +98,87 @@ const GameBoard = (() => {
     has_no_token,
     check_someone_won,
     reset,
+    is_full,
   };
 
 })();
 
-const Game = (() => {
-  // Initialization
-  let player1_next = true;
-  p1 = Player('Player1', 'X');
-  p2 = Player('Player2', 'O');
+const HTMLGameboard = (() => {
+  const gameboard = document.querySelector('.gameboard');
+  const info = document.querySelector('.info');
+  let token = 'X'
 
-  // Game start
-  console.log('Game started');
-  console.log(GameBoard.get_gameboard());
-
-  //while(GameBoard.check_someone_won == ''){
-  
-  let x = 0;
-  let y = 0;
-  if (player1_next){
-    if(GameBoard.has_no_token(x, y)){
-      GameBoard.place_token(p1.token, x, y);
-      player1_next = !player1_next;
+  const create_gameboard = () => {
+    for (let i = 0; i < 3; i++){
+      for (let j = 0; j < 3; j++){
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.id = `${i}_${j}`;
+        cell.addEventListener('click', (e) => {
+          
+          let xy = e.target.id.split('_');
+          if(Game.make_move(xy[0], xy[1])){
+            e.target.innerHTML = token;
+          }
+        })
+        gameboard.appendChild(cell);
+      }
     }
   }
-  else {
-    if(GameBoard.has_no_token(x, y)){
-      GameBoard.place_token(p2.token, x, y);
-      player1_next = !player1_next;
-    }
-  }
-  
-  console.log(GameBoard.check_someone_won());
-  console.log(GameBoard.get_gameboard());
-  console.log('Game finished');
 
+  const set_token = char => token = char;
+
+  const set_info = string => info.innerHTML = string;
+
+  create_gameboard();
+
+  return {
+    set_token,
+    set_info,
+  }
 })();
 
-//Game;
+const Game = (() => {
+  // Initialization
+  const p1 = Player('Player1', 'X');
+  const p2 = Player('Player2', 'O');
+  let current_player = p1;
+  let winner = ''
+  let finish = false;
+  
+  const next_player_info = () => HTMLGameboard.set_info(`Next move: ${current_player.name} (${current_player.token})`);
+  const player_won_info = () => HTMLGameboard.set_info(`${current_player.name} (${current_player.token}) WON!!`);
+  const no_winner_info = () => HTMLGameboard.set_info(`Tie! No one wins...`);
 
-//console.log(GameBoard.get_gameboard());
-//GameBoard.place_token('x', 2, 0);
-//GameBoard.place_token('x', 1, 1);
-//GameBoard.place_token('x', 0, 2);
-//console.log(GameBoard.get_gameboard());
-//console.log(GameBoard.check_someone_won());
+  const make_move = (x, y) => {
+    if(winner != '' || finish){
+      return false;
+    }
+    if(GameBoard.has_no_token(x, y)){
+      GameBoard.place_token(current_player.token, x, y);
+      HTMLGameboard.set_token(current_player.token);
+
+      winner = GameBoard.check_someone_won();
+      if(winner == ''){
+        current_player = current_player === p1 ? p2 : p1;
+        next_player_info();
+      }
+      else{
+        player_won_info();
+      }
+      if(GameBoard.is_full()){
+        no_winner_info();
+        finish = true;
+      }
+      return true;
+    }
+    return false;
+  }
+
+  next_player_info();
+
+  return {
+    make_move,
+    winner,
+  }
+})();
