@@ -1,13 +1,12 @@
 //Factories: Player
 
-const Player = () => {
+const Player = (name, token) => {
 
+  return {
+    name,
+    token,
+  }
 }
-
-//Modules: Gameboard, Game
-const Game = (() => {
-
-})();
 
 const GameBoard = (() => {
 
@@ -25,7 +24,7 @@ const GameBoard = (() => {
 
   const get_gameboard = () => gameboard;
 
-  const place_token = (token, x, y) => gameboard[y][x] = token
+  const place_token = (token='', x=0, y=0) => gameboard[y][x] = token
 
   const has_no_token = (x, y) => gameboard[y][x] == ''
 
@@ -38,7 +37,6 @@ const GameBoard = (() => {
     return '';
   }
   
-
   const check_horizontal = () => {
     for (let i = 0; i < gameboard.length; i++){
       let token = check_uniqueness(gameboard[i]);
@@ -46,7 +44,6 @@ const GameBoard = (() => {
     }
     return '';
   }
-    
   
   const check_vertical = () => {
     for (let i = 0; i < gameboard.length; i++){
@@ -89,18 +86,59 @@ const GameBoard = (() => {
     
   }
 
+  const reset = () => {
+    gameboard = [];
+    create_gameboard();
+  }
+
   return {
     get_gameboard,
     place_token,
     has_no_token,
     check_someone_won,
+    reset,
   };
 
 })();
 
-console.log(GameBoard.get_gameboard());
-GameBoard.place_token('x', 2, 0);
-GameBoard.place_token('x', 1, 1);
-GameBoard.place_token('x', 0, 2);
-console.log(GameBoard.get_gameboard());
-console.log(GameBoard.check_board());
+const Game = (() => {
+  // Initialization
+  let player1_next = true;
+  p1 = Player('Player1', 'X');
+  p2 = Player('Player2', 'O');
+
+  // Game start
+  console.log('Game started');
+  console.log(GameBoard.get_gameboard());
+
+  //while(GameBoard.check_someone_won == ''){
+  
+  let x = 0;
+  let y = 0;
+  if (player1_next){
+    if(GameBoard.has_no_token(x, y)){
+      GameBoard.place_token(p1.token, x, y);
+      player1_next = !player1_next;
+    }
+  }
+  else {
+    if(GameBoard.has_no_token(x, y)){
+      GameBoard.place_token(p2.token, x, y);
+      player1_next = !player1_next;
+    }
+  }
+  
+  console.log(GameBoard.check_someone_won());
+  console.log(GameBoard.get_gameboard());
+  console.log('Game finished');
+
+})();
+
+//Game;
+
+//console.log(GameBoard.get_gameboard());
+//GameBoard.place_token('x', 2, 0);
+//GameBoard.place_token('x', 1, 1);
+//GameBoard.place_token('x', 0, 2);
+//console.log(GameBoard.get_gameboard());
+//console.log(GameBoard.check_someone_won());

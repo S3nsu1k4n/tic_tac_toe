@@ -1,3 +1,16 @@
 body{
   background-color: black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 98vh;
+  height: 98vh;
+}
+
+.gameboard{
+  background-color: white;
+  height: 50%;
+  width: 50%;
+  display: grid;
 }
